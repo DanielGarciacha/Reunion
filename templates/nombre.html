@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta Rifa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white text-center">
+            <h4>Consultar Número</h4>
+        </div>
+
+        <div class="card-body text-center">
+
+            <input type="number" id="numeroBuscar"
+                   class="form-control mb-3"
+                   placeholder="Ingrese número de rifa">
+
+            <button class="btn btn-success w-100"
+                    onclick="buscarNumero()">
+                Consultar
+            </button>
+
+            <hr>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalResultado" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Resultado</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-center" id="contenidoModal">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function buscarNumero(){
+
+        let numero = document.getElementById("numeroBuscar").value;
+
+        if(numero === ""){
+            alert("Ingrese un número");
+            return;
+        }
+
+        axios.get("/consultar/" + numero)
+            .then(response => {
+
+                let modalBody = document.getElementById("contenidoModal");
+
+                if(response.data.nombre){
+
+                    modalBody.innerHTML =
+                        "<h4 class='text-success'>🎉 FELICITACIONES 🎉</h4>" +
+                        "<p>El número pertenece a:</p>" +
+                        "<h3>" + response.data.nombre + "</h3>";
+
+                } else {
+
+                    modalBody.innerHTML =
+                        "<h4 class='text-danger'>Número no encontrado</h4>";
+
+                }
+
+                let modal = new bootstrap.Modal(
+                    document.getElementById("modalResultado")
+                );
+
+                modal.show();
+
+            })
+            .catch(error => {
+                alert("Error al consultar");
+                console.log(error);
+            });
+    }
+</script>
+
+</body>
+</html>

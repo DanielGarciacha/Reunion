@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Rifa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white text-center">
+            <h4>Registro de Rifa</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form id="formRegistro">
+
+                <div class="mb-3">
+                    <input type="text" name="nombre" class="form-control" placeholder="Nombre completo" required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="number" name="cedula" class="form-control" placeholder="Cédula" required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="number" name="telefono" class="form-control" placeholder="Teléfono" required>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-4">
+                        <select name="tipo_direccion" class="form-select" required>
+                            <option value="">Tipo</option>
+                            <option value="Calle">Calle</option>
+                            <option value="Carrera">Carrera</option>
+                        </select>
+                    </div>
+
+                    <div class="col-8">
+                        <input type="text" name="numero_direccion"
+                               class="form-control"
+                               placeholder="Ej: 45 # 20 - 30"
+                               required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Líder</label>
+                    <select name="lider" class="form-select" required>
+                        <option value="">Seleccione un líder</option>
+                        <option value="MANUELITO">MANUELITO</option>
+                        <option value="CHIQUI">CHIQUI</option>
+                        <option value="EDWIN">EDWIN</option>
+                        <option value="LAURA">LAURA</option>
+                        <option value="ZULMA">ZULMA</option>
+                        <option value="EL MONO">EL MONO</option>
+                        <option value="ROSA">ROSA</option>
+                        <option value="ALCIDES">ALCIDES</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-success w-100">
+                    Registrar
+                </button>
+
+            </form>
+
+            <div id="resultado" class="mt-4 text-center"></div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    document.getElementById("formRegistro").addEventListener("submit", function(e){
+        e.preventDefault();
+
+        let formData = new FormData(this);
+
+        axios.post("/registrar", formData)
+            .then(response => {
+
+                document.getElementById("resultado").innerHTML =
+                    "<div class='alert alert-success'>" +
+                    "<h5>🎉 Registrado correctamente</h5>" +
+                    "<h3>Tu número es: " + response.data.numero + "</h3>" +
+                    "</div>";
+
+                this.reset();
+            })
+            .catch(error => {
+                document.getElementById("resultado").innerHTML =
+                    "<div class='alert alert-danger'>Error al registrar</div>";
+                console.log(error);
+            });
+    });
+</script>
+
+</body>
+</html>
