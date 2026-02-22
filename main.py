@@ -26,7 +26,10 @@ def consulta():
 def registrar():
     try:
         nombre = request.form.get('nombre')
+        cedula = request.form.get('cedula')
         telefono = request.form.get('telefono')
+        tipo_direccion = request.form.get('tipo_direccion')
+        numero_direccion = request.form.get('numero_direccion')
         lider = request.form.get('lider')
 
         if not nombre or not telefono or not lider:
@@ -36,11 +39,20 @@ def registrar():
         cursor = db.cursor()
 
         sql = """
-        INSERT INTO rifa (nombre_apellido, telefono, lider,tipo_direccion,numero_direccion,cedula)
-        VALUES (%s, %s, %s)
+        INSERT INTO rifa 
+        (nombre_apellido, telefono, lider, tipo_direccion, numero_direccion, cedula)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """
 
-        cursor.execute(sql, (nombre, telefono, lider))
+        cursor.execute(sql, (
+            nombre,
+            telefono,
+            lider,
+            tipo_direccion,
+            numero_direccion,
+            cedula
+        ))
+
         db.commit()
 
         return jsonify({"numero": cursor.lastrowid})
@@ -78,4 +90,5 @@ def consultar(numero):
 if __name__ == '__main__':
 
     app.run()
+
 
