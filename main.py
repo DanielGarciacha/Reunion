@@ -1,26 +1,39 @@
 from flask import Flask, render_template, request, jsonify
 import mysql.connector
+from mysql.connector import pooling
 import os
 
 app = Flask(__name__)
 
+=
+
+dbconfig = {
+    "host": os.environ.get("DB_HOST"),
+    "user": os.environ.get("DB_USER"),
+    "password": os.environ.get("DB_PASSWORD"),
+    "database": os.environ.get("DB_NAME"),
+    "port": 3306
+}
+
+connection_pool = pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=5,
+    **dbconfig
+)
+
 def get_db_connection():
-    return mysql.connector.connect(
-        host=os.environ.get("DB_HOST"),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME"),
-        port=3306
-    )
+    return connection_pool.get_connection()
+
 
 @app.route('/')
 def registro():
-    return render_template('index.html')  # registro
+    return render_template('index.html')
 
 
 @app.route('/consulta')
 def consulta():
     return render_template('nombre.html')
+
 
 @app.route('/registrar', methods=['POST'])
 def registrar():
@@ -54,12 +67,18 @@ def registrar():
         ))
 
         db.commit()
+        numero_generado = cursor.lastrowid
 
-        return jsonify({"numero": cursor.lastrowid})
+        cursor.close()
+        db.close()
+
+        return jsonify({"numero": numero_generado})
 
     except Exception as e:
         print("ERROR REGISTRO:", e)
         return jsonify({"mensaje": "Error al registrar"}), 500
+
+
 
 @app.route('/consultar/<int:numero>', methods=['GET'])
 def consultar(numero):
@@ -74,6 +93,9 @@ def consultar(numero):
 
         resultado = cursor.fetchone()
 
+        cursor.close()
+        db.close()
+
         if resultado:
             return jsonify({
                 "nombre": resultado["nombre_apellido"],
@@ -87,8 +109,9 @@ def consultar(numero):
         print("ERROR CONSULTA:", e)
         return jsonify({"nombre": None})
 
+
+# ======================================
+
 if __name__ == '__main__':
-
     app.run()
-
 
