@@ -1,14 +1,15 @@
 from flask import Flask, render_template, request, jsonify
 import mysql.connector
+import os
 
 app = Flask(__name__)
 
 def get_db_connection():
     return mysql.connector.connect(
-        host="bsfju9vs3mdcjjbrcpar-mysql.services.clever-cloud.com",
-        user="u1rpyolrzo4bjxzh",
-        password="EKibxS6hn5vWJG6051bT",
-        database="bsfju9vs3mdcjjbrcpar",
+        host=os.environ.get("DB_HOST"),
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASSWORD"),
+        database=os.environ.get("DB_NAME"),
         port=3306
     )
 
@@ -75,4 +76,5 @@ def consultar(numero):
         return jsonify({"nombre": None})
 
 if __name__ == '__main__':
+
     app.run()
