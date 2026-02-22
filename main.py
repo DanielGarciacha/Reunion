@@ -36,7 +36,7 @@ def registrar():
         cursor = db.cursor()
 
         sql = """
-        INSERT INTO rifa (nombre_apellido, telefono, lider)
+        INSERT INTO rifa (nombre_apellido, telefono, lider,tipo_direccion,numero_direccion,cedula)
         VALUES (%s, %s, %s)
         """
 
@@ -78,3 +78,4 @@ def consultar(numero):
 if __name__ == '__main__':
 
     app.run()
+
