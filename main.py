@@ -30,11 +30,6 @@ def registro():
     return render_template('index.html')
 
 
-@app.route('/consulta')
-def consulta():
-    return render_template('nombre.html')
-
-
 @app.route('/registrar', methods=['POST'])
 def registrar():
     try:
@@ -45,40 +40,36 @@ def registrar():
         numero_direccion = request.form.get('numero_direccion')
         lider = request.form.get('lider')
 
-        if not nombre or not telefono or not lider:
-            return jsonify({"mensaje": "Faltan datos"}), 400
+        # 🔥 Unimos la dirección
+        direccion_completa = f"{tipo_direccion} {numero_direccion}"
 
         db = get_db_connection()
         cursor = db.cursor()
 
         sql = """
         INSERT INTO rifa 
-        (nombre_apellido, telefono, lider, tipo_direccion, numero_direccion, cedula)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        (nombre_apellido, telefono, lider, direccion, cedula)
+        VALUES (%s, %s, %s, %s, %s)
         """
 
         cursor.execute(sql, (
             nombre,
             telefono,
             lider,
-            tipo_direccion,
-            numero_direccion,
+            direccion_completa,
             cedula
         ))
 
         db.commit()
-        numero_generado = cursor.lastrowid
 
         cursor.close()
         db.close()
 
-        return jsonify({"numero": numero_generado})
+        return jsonify({"numero": cursor.lastrowid})
 
     except Exception as e:
         print("ERROR REGISTRO:", e)
         return jsonify({"mensaje": "Error al registrar"}), 500
-
-
 
 @app.route('/consultar/<int:numero>', methods=['GET'])
 def consultar(numero):
@@ -93,9 +84,6 @@ def consultar(numero):
 
         resultado = cursor.fetchone()
 
-        cursor.close()
-        db.close()
-
         if resultado:
             return jsonify({
                 "nombre": resultado["nombre_apellido"],
@@ -108,10 +96,9 @@ def consultar(numero):
     except Exception as e:
         print("ERROR CONSULTA:", e)
         return jsonify({"nombre": None})
-
-
 # ======================================
 
 if __name__ == '__main__':
     app.run()
+
 
