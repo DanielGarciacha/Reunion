@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-=
+
 
 dbconfig = {
     "host": os.environ.get("DB_HOST"),
@@ -100,5 +100,6 @@ def consultar(numero):
 
 if __name__ == '__main__':
     app.run()
+
 
 
