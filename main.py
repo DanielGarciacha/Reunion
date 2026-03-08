@@ -17,7 +17,7 @@ dbconfig = {
 # Pool pequeño para no superar el límite de Clever Cloud
 connection_pool = pooling.MySQLConnectionPool(
     pool_name="mypool",
-    pool_size=2,
+    pool_size=1,
     **dbconfig
 )
 
@@ -102,3 +102,4 @@ def consultar(numero):
 
 if __name__ == '__main__':
     app.run()
+
