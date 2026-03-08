@@ -5,8 +5,7 @@ import os
 
 app = Flask(__name__)
 
-
-
+# Configuración de la base de datos
 dbconfig = {
     "host": os.environ.get("DB_HOST"),
     "user": os.environ.get("DB_USER"),
@@ -15,20 +14,19 @@ dbconfig = {
     "port": 3306
 }
 
+# Pool pequeño para no superar el límite de Clever Cloud
 connection_pool = pooling.MySQLConnectionPool(
     pool_name="mypool",
-    pool_size=5,
+    pool_size=2,
     **dbconfig
 )
 
 def get_db_connection():
     return connection_pool.get_connection()
 
-
 @app.route('/')
 def registro():
     return render_template('index.html')
-
 
 @app.route('/registrar', methods=['POST'])
 def registrar():
@@ -40,7 +38,6 @@ def registrar():
         numero_direccion = request.form.get('numero_direccion')
         lider = request.form.get('lider')
 
-        # 🔥 Unimos la dirección
         direccion_completa = f"{tipo_direccion} {numero_direccion}"
 
         db = get_db_connection()
@@ -61,15 +58,17 @@ def registrar():
         ))
 
         db.commit()
+        numero_generado = cursor.lastrowid
 
         cursor.close()
         db.close()
 
-        return jsonify({"numero": cursor.lastrowid})
+        return jsonify({"numero": numero_generado})
 
     except Exception as e:
         print("ERROR REGISTRO:", e)
         return jsonify({"mensaje": "Error al registrar"}), 500
+
 
 @app.route('/consultar/<int:numero>', methods=['GET'])
 def consultar(numero):
@@ -84,6 +83,9 @@ def consultar(numero):
 
         resultado = cursor.fetchone()
 
+        cursor.close()
+        db.close()
+
         if resultado:
             return jsonify({
                 "nombre": resultado["nombre_apellido"],
@@ -96,10 +98,7 @@ def consultar(numero):
     except Exception as e:
         print("ERROR CONSULTA:", e)
         return jsonify({"nombre": None})
-# ======================================
+
 
 if __name__ == '__main__':
     app.run()
-
-
-
